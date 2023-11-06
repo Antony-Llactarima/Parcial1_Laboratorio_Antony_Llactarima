@@ -6,6 +6,7 @@ pantalla = {
     'color': (0,0,0),
     'menu': True,
     'tutorial': False,
+    'puntos': False,
     'game_over': False,
     'juego': False
 }

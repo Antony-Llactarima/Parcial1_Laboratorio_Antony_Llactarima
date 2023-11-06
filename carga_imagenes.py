@@ -4,7 +4,10 @@ import pygame as pg
 pantalla_inicio = pg.image.load("imgs\img_tecnicos\_pantalla_inicio\_menu_inicio.png")
 boton_jugar = pg.image.load("imgs\img_tecnicos\_pantalla_inicio\_boton_jugar.png")
 boton_salir = pg.image.load("imgs\img_tecnicos\_pantalla_inicio\_boton_salir.png")
+boton_puntos = pg.image.load("imgs\img_tecnicos\_pantalla_inicio\_boton_puntos.png")
 
+# PANTALLA DE PUNTOS -------------------------------------
+boton_atras = pg.image.load("imgs\img_tecnicos\_pantalla_puntos\_boton_atras.png")
 # PANTALLA DE TUTORIAL -------------------------------------------------------------
 pantalla_tutorial = pg.image.load("imgs\img_tecnicos\_pantalla_tutorial\_pantalla_tutorial.png")
 
@@ -98,7 +101,9 @@ pantalla_imgs = {
 botones_imgs = {
     'jugar': boton_jugar,
     'menu': boton_menu,
-    'salir': boton_salir
+    'salir': boton_salir,
+    'puntos': boton_puntos,
+    'atras': boton_atras
 }
 
 # DICC. BARRA VIDAS ------------------------------------------------
@@ -108,8 +113,7 @@ vida_imgs = {
     'mitad': vida_mitad,
     'semi_baja': vida_semibaja,
     'baja': vida_baja,
-    'vacia': vida_vacia
-
+    'vacia': vida_vacia,
 }
 
 # DICC. JUGADOR -------------------------------------------------

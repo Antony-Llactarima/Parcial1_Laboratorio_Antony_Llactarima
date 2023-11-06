@@ -4,6 +4,7 @@ from funciones.func_personajes import *
 import carga_imagenes as c_img
 from funciones.func_municiones import *
 from funciones.func_powerup import *
+from funciones.func_puntaje import *
 
 # INICIALIZACION DE PYGAME Y MIXE ------------------------------------------------------------
 pg.init()
@@ -39,6 +40,11 @@ colision_powr_sound = pg.mixer.Sound("sounds\_power_ups\coin-upaif-14631 (1).mp3
 # SONIDO DE GAME OVER --------------------------------------------------------
 game_over_sound = pg.mixer.Sound("sounds\game_over\gameover-86548.mp3")
 
+# RECOPILACION DE LOS PUNTAJES --------------------------------
+l_puntaje = []
+l_puntaje = abrir_puntajes(l_puntaje)
+if len(l_puntaje) > 0:
+    archivo_abierto = True
 
 # IMPORTACION DE TEXTO ------------------------------------------------------------
 f_sans_serif = pg.font.SysFont('sans-serif', 50)
@@ -47,8 +53,10 @@ f_sans_serif = pg.font.SysFont('sans-serif', 50)
 pantalla_mitad = [pantalla['tamanio'][0]/2, pantalla['tamanio'][1]/2]
 pos_boton_jugar = [(pantalla_mitad[0] / 2) - 150, pantalla['tamanio'][1] - 200]
 pos_boton_salir =  [((pantalla_mitad[0] / 2) + pantalla_mitad[0]) - 150, pantalla['tamanio'][1] - 200]
+pos_boton_puntos = [pantalla_mitad[0] - 125, 500]
 limit_b_jugar = [pos_boton_jugar[0] + 300, pos_boton_jugar[1] + 200]
 limit_b_salir = [pos_boton_salir[0] + 300, pos_boton_salir[1] + 200]
+limit_b_puntos = [pos_boton_puntos[0] + 250, pos_boton_puntos[1] + 100]
 
 # POSICIONAR BOTONES DE GAME OVER ------------------------
 pos_boton_menu = [(pantalla_mitad[0] / 2) - 150, pantalla['tamanio'][1] - 200]
@@ -75,7 +83,7 @@ while juego_activo:
             juego_activo = False
         
         # DETECCION EN PANTALLA DE INICIO Y PANTALLA GAME OVER ----------------------------
-        if pantalla['menu'] or pantalla['game_over']:
+        if pantalla['menu'] or pantalla['game_over'] or pantalla['puntos']:
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 clicked = True
@@ -166,11 +174,23 @@ while juego_activo:
                 # PONER EL CLICKEO EN FALSO ----------------------------------------
                 clicked = False
                 
+            elif detectar_click(mouse_pos, pos_boton_puntos, limit_b_puntos):
+                pantalla['menu'] = False
+                pantalla['puntos'] = True
+                clicked = False
                 # EVENTOS SI SE CLICKEA EN ALGUNA OTRA PARTE ------------------------
             else:
                 # PONER EL CLICKEO EN FALSO ----------------------------------------
                 clicked = False
         
+    elif pantalla['puntos']:
+        if clicked:
+            if detectar_click(mouse_pos, pos_boton_puntos, limit_b_puntos):
+                pantalla['menu'] = True
+                pantalla['puntos'] = False
+                clicked = False
+            else:
+                clicked = False
         # CORRIENDO LA PANTALLA DE JUEGO ---------------------------------------------
     elif pantalla['juego']:
         # MOVIMIENTO CONSTANTE DEL TANKE ----------------------------------------------
@@ -274,6 +294,10 @@ while juego_activo:
             pg.mixer.music.load("sounds\game_over\organ-bossa-30-seconds-4644.mp3")
             pg.mixer.music.play(loops=-1)
             game_over_sound.play()
+            
+            if archivo_abierto:
+                if acomodar_puntajes(l_puntaje, player['puntaje']):
+                    reescribir_puntaje(l_puntaje)
         
         # PANTALLA DE GAME OVER --------------------------------
     elif pantalla['game_over']:
@@ -302,6 +326,10 @@ while juego_activo:
         screen.blit(c_img.pantalla_imgs['inicio'], (0,0))
         screen.blit(c_img.botones_imgs['jugar'], pos_boton_jugar)
         screen.blit(c_img.botones_imgs['salir'], pos_boton_salir)
+        screen.blit(c_img.botones_imgs['puntos'], pos_boton_puntos)
+        if archivo_abierto:
+            t_max_puntos = f_sans_serif.render(f"MAX PUNTOS: {l_puntaje[0]}", True, (255,255,255))
+        screen.blit(t_max_puntos, (490,620))
         
         # IMPLEMENTANDO IMAGENES EN LA PNTALLA DE TUORIAL ----------------------
     elif pantalla['tutorial']:
@@ -318,6 +346,18 @@ while juego_activo:
             if time_tutorial % fps == 0:
                 segundos_transcurridos -= 1
             time_tutorial += 1
+    elif pantalla['puntos']:
+        screen.blit(c_img.pantalla_imgs['juego'], (0,0))
+        puntos_orden = 0
+        text_superior_puntaje = f_sans_serif.render(f"MEJORES PUNTAJES", True, (255,255,255))
+        screen.blit(text_superior_puntaje, (450,0))
+        borde_pantalla = 50
+        for puntos in l_puntaje:
+            puntos_orden += 1
+            borde_pantalla += 50
+            texto_puntajes = f_sans_serif.render(f"{puntos_orden}: {puntos}", True, (255,255,255))
+            screen.blit(texto_puntajes, (600,borde_pantalla))
+        screen.blit(c_img.botones_imgs['atras'], pos_boton_puntos)
         
     # IMPLEMENTANDO IMAGENES A LA PANTALLA DE JUEGO --------------------------------
     elif pantalla['juego']:
