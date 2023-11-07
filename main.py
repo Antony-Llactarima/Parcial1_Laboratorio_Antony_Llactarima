@@ -5,64 +5,68 @@ import carga_imagenes as c_img
 from funciones.func_municiones import *
 from funciones.func_powerup import *
 from funciones.func_puntaje import *
+import os
 
-# INICIALIZACION DE PYGAME Y MIXE ------------------------------------------------------------
+# INICIALIZACION DE PYGAME Y MIXER ------------------------------------------------------------
 pg.init()
 pg.mixer.init()
+
+# DECLARACION DE EL DIRECTORIO ACTUAL -------------------------------------------
+dir_actual = os.getcwd()
 
 # DECLARACION DE LA PANTALLA ------------------------------------------------------------
 pantalla = dec_pantalla()
 
 # INICIO DE PANTALLA Y TITULO ------------------------------------------------------------
 screen = pg.display.set_mode(pantalla['tamanio'])
-pg.display.set_caption("PARCIAL_1")
+pg.display.set_caption("SUPER TANK (Parcila 1)")
 
-# MUSICA EN EL MENU --------------------------------
-pg.mixer.music.load("sounds\_menu\loop-menu-preview-109594.mp3")
-pg.mixer.music.set_volume(.4)
-pg.mixer.music.play(loops=-1)
+# BUSCAR LA MUSICA Y SONIDOS QUE SE USARAN ---------------------------------------------
+try:
+    pg.mixer.music.load(os.path.join(dir_actual, "sounds\_menu\loop-menu-preview-109594.mp3"))
+    # EFECTOS DE SONIDO ------------------------------------------------------------
+    # BALA 1  --------------------------------
+    disparo1_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_balas\shooting-sound-fx-159024.mp3"))
+    sin_balas_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_balas\_rifle-clip-empty-98832.mp3"))
+    # BALA 2  -----------------------
+    disparo2_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_balas\shoot02wav-14562.mp3"))
+    # SONIDOS DE BOTONES ----------------------------------------------------------
+    click_boton_jugar_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_botones\_click-menu-app-147357.mp3"))
+    click_boton_menu_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_botones\interface-124464.mp3"))
+    # EFECTOS CON ENEMIGOS --------------------------------------------------------
+    colision_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_enemigos\musket-explosion-6383.mp3"))
+    disparo_enemigo_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_enemigos\explosion-36210.mp3"))
+    # SONIDO DE POWER UPS
+    aparicion_powers_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_power_ups\energy-90321.mp3"))
+    colision_powr_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\_power_ups\coin-upaif-14631 (1).mp3"))
+    # SONIDO DE GAME OVER --------------------------------------------------------
+    game_over_sound = pg.mixer.Sound(os.path.join(dir_actual,"sounds\game_over\gameover-86548.mp3"))
+    sound_music_encontrada = True
+except:
+    print("Error... no se pudo encontrar los Sonidos")
+    sound_music_encontrada = False
 
-# EFECTOS DE SONIDO ------------------------------------------------------------
-# BALA 1  --------------------------------
-disparo1_sound = pg.mixer.Sound("sounds\_balas\shooting-sound-fx-159024.mp3")
-sin_balas = pg.mixer.Sound("sounds\_balas\_rifle-clip-empty-98832.mp3")
-# BALA 2  -----------------------
-disparo2_sound = pg.mixer.Sound("sounds\_balas\shoot02wav-14562.mp3")
-# SONIDOS DE BOTONES ----------------------------------------------------------
-click_boton_jugar_sound = pg.mixer.Sound("sounds\_botones\_click-menu-app-147357.mp3")
-click_boton_menu_sound = pg.mixer.Sound("sounds\_botones\interface-124464.mp3")
-# EFECTOS CON ENEMIGOS --------------------------------------------------------
-colision_sound = pg.mixer.Sound("sounds\_enemigos\musket-explosion-6383.mp3")
-disparo_enemigo_sound = pg.mixer.Sound("sounds\_enemigos\explosion-36210.mp3")
-# SONIDO DE POWER UPS
-aparicion_powers_sound = pg.mixer.Sound("sounds\_power_ups\energy-90321.mp3")
-colision_powr_sound = pg.mixer.Sound("sounds\_power_ups\coin-upaif-14631 (1).mp3")
-# SONIDO DE GAME OVER --------------------------------------------------------
-game_over_sound = pg.mixer.Sound("sounds\game_over\gameover-86548.mp3")
-
-# RECOPILACION DE LOS PUNTAJES --------------------------------
+# RECOPILACION DE LOS MEJORES PUNTAJES --------------------------------
 l_puntaje = []
-l_puntaje = abrir_puntajes(l_puntaje)
-if len(l_puntaje) > 0:
-    archivo_abierto = True
+archivo_abierto = abrir_puntajes(l_puntaje, dir_actual)
 
 # IMPORTACION DE TEXTO ------------------------------------------------------------
 f_sans_serif = pg.font.SysFont('sans-serif', 50)
 
 # POSICIONES DE LOS BOTONES EN PANTALLA DE INICIO --------------------------------
 pantalla_mitad = [pantalla['tamanio'][0]/2, pantalla['tamanio'][1]/2]
-pos_boton_jugar = [(pantalla_mitad[0] / 2) - 150, pantalla['tamanio'][1] - 200]
-pos_boton_salir =  [((pantalla_mitad[0] / 2) + pantalla_mitad[0]) - 150, pantalla['tamanio'][1] - 200]
-pos_boton_puntos = [pantalla_mitad[0] - 125, 500]
-limit_b_jugar = [pos_boton_jugar[0] + 300, pos_boton_jugar[1] + 200]
-limit_b_salir = [pos_boton_salir[0] + 300, pos_boton_salir[1] + 200]
-limit_b_puntos = [pos_boton_puntos[0] + 250, pos_boton_puntos[1] + 100]
+pos_btn_jugar = [0, pantalla['tamanio'][1] - 200]
+pos_btn_salir =  [pantalla['tamanio'][0] - 300 , pantalla['tamanio'][1] - 200]
+pos_btn_puntos = [pantalla_mitad[0] - 125, 500]
+limit_btn_jugar = [pos_btn_jugar[0] + 300, pos_btn_jugar[1] + 200]
+limit_btn_salir = [pos_btn_salir[0] + 300, pos_btn_salir[1] + 200]
+limit_btn_puntos = [pos_btn_puntos[0] + 250, pos_btn_puntos[1] + 100]
 
 # POSICIONAR BOTONES DE GAME OVER ------------------------
-pos_boton_menu = [(pantalla_mitad[0] / 2) - 150, pantalla['tamanio'][1] - 200]
-limit_b_menu = [pos_boton_menu[0] + 300, pos_boton_menu[1] + 200]
+pos_btn_menu = [0, pantalla['tamanio'][1] - 200]
+limit_btn_menu = [pos_btn_menu[0] + 300, pos_btn_menu[1] + 200]
 
-# FRAMES POR SGUNDOS --------------------------------------------
+# FRAMES POR SEGUNDOS --------------------------------------------
 fps = 30
 
 # DETECTOR DE CLICK EN LOS BOTONES --------------------------------------------
@@ -70,6 +74,11 @@ clicked = False
 
 # BANDERA PARA CORRER EL JUEGO --------------------------------------------
 juego_activo = True
+
+# ACTIVAR LA MUSICA DE INICIO --------------------------------------------
+if sound_music_encontrada:
+    pg.mixer.music.set_volume(.4)
+    pg.mixer.music.play(loops=-1)
 
 # INICIO DEL BUCLE PRINCIPAL ----------------------------------------------
 while juego_activo:
@@ -82,7 +91,7 @@ while juego_activo:
         if event.type == pg.QUIT:
             juego_activo = False
         
-        # DETECCION EN PANTALLA DE INICIO Y PANTALLA GAME OVER ----------------------------
+        # DETECCION EN PANTALLA DE INICIO Y PANTALLA GAME OVER -------------------------
         if pantalla['menu'] or pantalla['game_over'] or pantalla['puntos']:
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
@@ -107,22 +116,26 @@ while juego_activo:
                 # DETECCION PARA EL DISPARO --------------------------------
                 if event.key == pg.K_z:
                     if disparo_bala(l_balas_1):
-                        disparo1_sound.play()
+                        if sound_music_encontrada:
+                            disparo1_sound.play()
                     else:
-                        sin_balas.play()
+                        if sound_music_encontrada:
+                            sin_balas_sound.play()
                 elif event.key == pg.K_x:
                     if len(l_balas_2) > 0:
                         disparo_bala(l_balas_2)
-                        disparo2_sound.play()
+                        if sound_music_encontrada:
+                            disparo2_sound.play()
                     else:
-                        sin_balas.play()
+                        if sound_music_encontrada:
+                            sin_balas_sound.play()
     
     # CORRIENDO LA PANTALLA DE INICIO ---------------------------------------------
     if pantalla['menu']:
         # EVENTOS SI CLICKEA DENTRO DE PANTALLA DE INICIO ----------------------
         if clicked:
             # EVENTOS SI CLICKEO EN 'JUGAR' ------------------------------------
-            if detectar_click(mouse_pos, pos_boton_jugar, limit_b_jugar):
+            if detectar_click(mouse_pos, pos_btn_jugar, limit_btn_jugar):
                 # LISTA DE ENEMIGOS --------------------------------
                 l_enemigos = []
                 # LISTA DE BALAS 1 --------------------------------------------
@@ -144,7 +157,6 @@ while juego_activo:
                 
                 # DECLARACION DE LAS BALAS 1 -----------------------------------
                 llenar_lista_balas(l_balas_1, c_balas_1)
-                # reiniciar_balas(l_balas_1)
                 
                 # CAMBIO DE PANTALLA --------------------------------------------
                 pantalla['menu'] = False
@@ -158,23 +170,23 @@ while juego_activo:
                 
                 # CUANTOS SEGUNDOS SERA EL TUTORIAL ------------------------------
                 segundos_transcurridos = 4
-                
                 # DETENER LA MUSICA --------------------------------
-                pg.mixer.music.stop()
-                # SONIDO DE CLICKEO --------------------------------------------
-                click_boton_jugar_sound.play()
+                if sound_music_encontrada:
+                    pg.mixer.music.stop()
+                    # SONIDO DE CLICKEO --------------------------------------------
+                    click_boton_jugar_sound.play()
                 
                 # DEJAR EL CLICKEO EN FALSO -------------------------------------
                 clicked = False
                 
                 # EVENTOS SI SE CLICKEA EN 'SALIR' ---------------------------------
-            elif detectar_click(mouse_pos, pos_boton_salir, limit_b_salir):
+            elif detectar_click(mouse_pos, pos_btn_salir, limit_btn_salir):
                 # DETENER EL JUEGO POR COMPLETO --------------------------------
                 juego_activo = False
                 # PONER EL CLICKEO EN FALSO ----------------------------------------
                 clicked = False
                 
-            elif detectar_click(mouse_pos, pos_boton_puntos, limit_b_puntos):
+            elif detectar_click(mouse_pos, pos_btn_puntos, limit_btn_puntos):
                 pantalla['menu'] = False
                 pantalla['puntos'] = True
                 clicked = False
@@ -182,10 +194,9 @@ while juego_activo:
             else:
                 # PONER EL CLICKEO EN FALSO ----------------------------------------
                 clicked = False
-        
     elif pantalla['puntos']:
         if clicked:
-            if detectar_click(mouse_pos, pos_boton_puntos, limit_b_puntos):
+            if detectar_click(mouse_pos, pos_btn_puntos, limit_btn_puntos):
                 pantalla['menu'] = True
                 pantalla['puntos'] = False
                 clicked = False
@@ -240,20 +251,23 @@ while juego_activo:
         
         # COLISION DE LOS ENEMIGOS ---------------------------------------------
         if colision_enemigo(l_enemigos, player):
-            colision_sound.play()
+            if sound_music_encontrada:
+                colision_sound.play()
         
         # POWER UPS ----------------------------------------------------------------
         # RECUPERAR VIDA ----------------------------------------------------------------
         if player['puntaje'] % 10 == 0 and player['puntaje'] > 0:
             if aparecer_vida == False:
-                aparicion_powers_sound.play()
+                if sound_music_encontrada:
+                    aparicion_powers_sound.play()
                 one_up = d_main.mas_vida.copy()
                 one_up['posicion'] = posicion_power_up(pantalla['tamanio'])
                 limite_power_up(one_up)
                 aparecer_vida = True
         if aparecer_vida:
             if colision_power_up(one_up, player):
-                colision_powr_sound.play()
+                if sound_music_encontrada:
+                    colision_powr_sound.play()
                 aumentar_vida(player, one_up)
                 player['puntaje'] += 1
                 aparecer_vida = False
@@ -261,39 +275,32 @@ while juego_activo:
         # GENERAR EL ITEM QUE GENERA LAS BALAS DE NIVEL 2 ------------------------------------------------------
         if player['puntaje'] % 5 == 0 and player['puntaje'] > 0:
             if f_bala2 == False:
-                aparicion_powers_sound.play()
+                if sound_music_encontrada:
+                    aparicion_powers_sound.play()
                 f_bala2 = True
                 item_balas2 = d_main.item_bala2.copy()
                 item_balas2['posicion'] = posicion_power_up(pantalla['tamanio'])
                 limite_power_up(item_balas2)
         if f_bala2:
             if colision_power_up(item_balas2, player):
-                colision_powr_sound.play()
+                if sound_music_encontrada:
+                    colision_powr_sound.play()
                 llenar_lista_balas(l_balas_2, c_balas_2)
                 player['puntaje'] += 1
                 f_bala2 = False
-        
-        # ELEGIR IMAGENES QUE SE USARAN --------------------------------------
-        for enemigo in l_enemigos:
-            if enemigo['nivel'] == 1:
-                image_enemigo(enemigo, c_img.enemigo_1_imgs)
-            elif enemigo['nivel'] == 2:
-                image_enemigo(enemigo, c_img.enemigo_2_imgs)
-            elif enemigo['nivel'] == 3:
-                image_enemigo(enemigo, c_img.enemigo_3_imgs)
-            elif enemigo['nivel'] == 4:
-                image_enemigo(enemigo, c_img.enemigo_4_imgs)
-            elif enemigo['nivel'] == 5:
-                image_enemigo(enemigo, c_img.enemigo_5_imgs)
         
         # VERIFICAR QUE EL JUGADOR ESTE VIVO --------------------------------
         if player['vida'] <= 0:
             pantalla['game_over'] = True
             pantalla['juego'] = False
-            pg.mixer.music.stop()
-            pg.mixer.music.load("sounds\game_over\organ-bossa-30-seconds-4644.mp3")
-            pg.mixer.music.play(loops=-1)
-            game_over_sound.play()
+            if sound_music_encontrada:
+                pg.mixer.music.stop()
+                try:
+                    pg.mixer.music.load(os.path.join(dir_actual,"sounds\game_over\organ-bossa-30-seconds-4644.mp3"))
+                    pg.mixer.music.play(loops=-1)
+                except:
+                    sound_music_encontrada = False
+                game_over_sound.play()
             
             if archivo_abierto:
                 if acomodar_puntajes(l_puntaje, player['puntaje']):
@@ -304,16 +311,20 @@ while juego_activo:
         # EVENTOS SI SE CLICKEA EN LA PANTALLA DE GAME OVER ---------------
         if clicked:
             # EVENTOS SI SE CLICKEA EN 'MENU' ------------------------------
-            if detectar_click(mouse_pos, pos_boton_menu, limit_b_menu):
+            if detectar_click(mouse_pos, pos_btn_menu, limit_btn_menu):
                 pantalla['game_over'] = False
                 pantalla['menu'] = True
                 clicked = False
-                pg.mixer.music.stop()
-                pg.mixer.music.load("sounds\_menu\loop-menu-preview-109594.mp3")
-                pg.mixer.music.play(loops=-1)
-                click_boton_menu_sound.play()
+                if sound_music_encontrada:
+                    pg.mixer.music.stop()
+                    try:
+                        pg.mixer.music.load(os.path.join(dir_actual,"sounds\_menu\loop-menu-preview-109594.mp3"))
+                        pg.mixer.music.play(loops=-1)
+                    except:
+                        sound_music_encontrada = False
+                    click_boton_menu_sound.play()
                 # EVENTOS SI SE CLICKEA EN SALIR ----------------------------
-            elif detectar_click(mouse_pos, pos_boton_salir, limit_b_salir):
+            elif detectar_click(mouse_pos, pos_btn_salir, limit_btn_salir):
                 juego_activo = False
             else:
                 clicked = False
@@ -324,9 +335,9 @@ while juego_activo:
     # IMPLEMENTAR IMAGENES EN LA PANTALLA DE INICIO ----------------------------
     if pantalla['menu']:
         screen.blit(c_img.pantalla_imgs['inicio'], (0,0))
-        screen.blit(c_img.botones_imgs['jugar'], pos_boton_jugar)
-        screen.blit(c_img.botones_imgs['salir'], pos_boton_salir)
-        screen.blit(c_img.botones_imgs['puntos'], pos_boton_puntos)
+        screen.blit(c_img.botones_imgs['jugar'], pos_btn_jugar)
+        screen.blit(c_img.botones_imgs['salir'], pos_btn_salir)
+        screen.blit(c_img.botones_imgs['puntos'], pos_btn_puntos)
         if archivo_abierto:
             t_max_puntos = f_sans_serif.render(f"MAX PUNTOS: {l_puntaje[0]}", True, (255,255,255))
         screen.blit(t_max_puntos, (490,620))
@@ -339,9 +350,13 @@ while juego_activo:
         if time_tutorial > (fps * 3):
             pantalla['tutorial'] = False
             pantalla['juego'] = True
-            pg.mixer.music.load("sounds\_juego\simple-piano-melody-9834.mp3")
-            pg.mixer.music.set_volume(.4)
-            pg.mixer.music.play(loops=-1)
+            if sound_music_encontrada:
+                try:
+                    pg.mixer.music.load(os.path.join(dir_actual,"sounds\_juego\simple-piano-melody-9834.mp3"))
+                    pg.mixer.music.set_volume(.4)
+                    pg.mixer.music.play(loops=-1)
+                except:
+                    sound_music_encontrada = False
         else:
             if time_tutorial % fps == 0:
                 segundos_transcurridos -= 1
@@ -357,27 +372,17 @@ while juego_activo:
             borde_pantalla += 50
             texto_puntajes = f_sans_serif.render(f"{puntos_orden}: {puntos}", True, (255,255,255))
             screen.blit(texto_puntajes, (600,borde_pantalla))
-        screen.blit(c_img.botones_imgs['atras'], pos_boton_puntos)
+        screen.blit(c_img.botones_imgs['atras'], pos_btn_puntos)
         
-    # IMPLEMENTANDO IMAGENES A LA PANTALLA DE JUEGO --------------------------------
+        # IMPLEMENTANDO IMAGENES A LA PANTALLA DE JUEGO -------------------
     elif pantalla['juego']:
         # SUELO PRINCIPAL ------------------------------
         screen.blit(c_img.pantalla_imgs['juego'], (0,0))
-        # LAS MUNICIONES --------------------------------
-        # BALA NIVEL 1 ----------------------------------
-        for bala in l_balas_1:
-            if bala['accion']:
-                screen.blit(bala['img'], bala['posicion'])
-        
-        # BALA 2 ---------------------------------------
-        for bala in l_balas_2:
-            if bala['accion'] and bala['direccion'] != 'none':
-                screen.blit(c_img.bala_2_imgs[bala['direccion']], bala['posicion'])
         
         # COLOCANDO LOS ENEMIGOS -------------------------------------
         for enemigo in l_enemigos:
             if enemigo['vida'] > 0:
-                if enemigo['timeWait'] % (fps/2) == 0:
+                if enemigo['timeWait'] % (fps/2) == 0 and enemigo['spawn'] == False:
                     # VACIO PARA TITILEO EN LA IMAGEN DE ADVERTENCIA --------------
                     pass
                 elif enemigo['nivel'] == 1:
@@ -395,7 +400,16 @@ while juego_activo:
                         screen.blit(c_img.enemigo_5_imgs[enemigo['direccion']], (enemigo['posicion'][0], pantalla['tamanio'][1] - enemigo['tamanio'][1]))
                     else:
                         screen.blit(c_img.enemigo_5_imgs[enemigo['direccion']], enemigo['posicion'])
-
+        # LAS MUNICIONES --------------------------------
+        # BALA NIVEL 1 ----------------------------------
+        for bala in l_balas_1:
+            if bala['accion']:
+                screen.blit(bala['img'], bala['posicion'])
+        
+        # BALA 2 ---------------------------------------
+        for bala in l_balas_2:
+            if bala['accion'] and bala['direccion'] != 'none':
+                screen.blit(c_img.bala_2_imgs[bala['direccion']], bala['posicion'])
         
         # DIBUJAR VIDA EXTRA ----------------------------------------------------------------
         if aparecer_vida:
@@ -467,8 +481,8 @@ while juego_activo:
         # PANTALLA DE GAME OVER ----------------------------------------------------------------
     elif pantalla['game_over']:
         screen.blit(c_img.pantalla_imgs['gameOver'], (0,0))
-        screen.blit(c_img.botones_imgs['menu'], pos_boton_menu)
-        screen.blit(c_img.botones_imgs['salir'], pos_boton_salir)
+        screen.blit(c_img.botones_imgs['menu'], pos_btn_menu)
+        screen.blit(c_img.botones_imgs['salir'], pos_btn_salir)
         screen.blit(puntos_texto, (550, 600))
     
     pg.display.flip()

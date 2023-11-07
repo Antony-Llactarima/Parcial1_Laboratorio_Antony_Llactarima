@@ -152,7 +152,7 @@ def completar_lista_enemigos(l_enemigos:list, puntos:int, c_enemigos):
             if len(l_enemigos) == c_enemigos:
                 break
 
-def regerar_enemigos(l_enemigos, puntos):
+def regerar_enemigos(l_enemigos:list, puntos:int)->None:
     for i in range(len(l_enemigos)):
         if l_enemigos[i]['vida'] <= 0:
             e_reemplazo = elegir_enemigos(puntos)
@@ -264,6 +264,28 @@ def dir_enemy_nivel4(enemigo):
         elif e_direccion == 3:
             enemigo['direccion'] = 'up_right'
 
+def cambiar_direccion(enemigo, tam_pantalla):
+    if (enemigo['posicion'][0] + enemigo['tamanio'][0]) > tam_pantalla[0]:
+        if enemigo['direccion'] == 'up_right':
+            enemigo['direccion'] = 'up_left'
+        else:
+            enemigo['direccion'] = 'down_left'
+    elif enemigo['posicion'][0] < 0:
+        if enemigo['direccion'] == 'up_left':
+            enemigo['direccion'] = 'up_right'
+        else:
+            enemigo['direccion'] = 'down_right'
+    elif (enemigo['posicion'][1] + enemigo['tamanio'][1]) > tam_pantalla[1]:
+        if enemigo['direccion'] == 'down_right':
+            enemigo['direccion'] = 'up_right'
+        else:
+            enemigo['direccion'] = 'up_left'
+    elif enemigo['posicion'][1] < 50:
+        if enemigo['direccion'] == 'up_left':
+            enemigo['direccion'] = 'down_left'
+        else:
+            enemigo['direccion'] = 'down_right'
+
 def dir_enemy_nivel5(enemigo, tam_pantalla):
     if enemigo['direccion'] == 'none_down':
         enemigo['direccion'] = 'down'
@@ -312,34 +334,14 @@ def direccionar_enemigos(enemigo:dict, player:dict, tam_pantalla:list):
         enemigo['direccion'] = dir_enemy_nivel3(centro_x,centro_y, player)
     elif enemigo['nivel'] == 4:
         dir_enemy_nivel4(enemigo)
-        if 'posicion' in enemigo:
-            if (enemigo['posicion'][0] + enemigo['tamanio'][0]) > tam_pantalla[0]:
-                if enemigo['direccion'] == 'up_right':
-                    enemigo['direccion'] = 'up_left'
-                else:
-                    enemigo['direccion'] = 'down_left'
-            elif enemigo['posicion'][0] < 0:
-                if enemigo['direccion'] == 'up_left':
-                    enemigo['direccion'] = 'up_right'
-                else:
-                    enemigo['direccion'] = 'down_right'
-            elif (enemigo['posicion'][1] + enemigo['tamanio'][1]) > tam_pantalla[1]:
-                if enemigo['direccion'] == 'down_right':
-                    enemigo['direccion'] = 'up_right'
-                else:
-                    enemigo['direccion'] = 'up_left'
-            elif enemigo['posicion'][1] < 50:
-                if enemigo['direccion'] == 'up_left':
-                    enemigo['direccion'] = 'down_left'
-                else:
-                    enemigo['direccion'] = 'down_right'
+        cambiar_direccion(enemigo, tam_pantalla)
     elif enemigo['nivel'] == 5:
         dir_enemy_nivel5(enemigo, tam_pantalla)
 
 def colision_enemigo(l_enemigos, player):
     choque = False
     for enemigo in l_enemigos:
-        if enemigo['direccion'] != 'none' and enemigo['direccion'] != 'none_up' and enemigo['direccion'] != 'none_down':
+        if enemigo['spawn']:
             if (enemigo['limite'][0] - 10 > player['posicion'][0]) and (enemigo['posicion'][0] + 10 < player['limite'][0]) and (enemigo['limite'][1] - 10 > player['posicion'][1]) and (enemigo['posicion'][1] + 10 < player['limite'][1]) :
                 player['vida'] -= 1
                 enemigo['vida'] = 0

@@ -1,6 +1,6 @@
 # DICCIONARIOS DE PERSONAJES QUE APARECEN EN EL JUEGO
 
-# PANTALLA
+# PANTALLA ----------------------------------------------------------------
 pantalla = {
     'tamanio': [1280, 720],
     'color': (0,0,0),
